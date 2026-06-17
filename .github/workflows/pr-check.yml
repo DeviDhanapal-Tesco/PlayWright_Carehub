@@ -1,0 +1,45 @@
+
+
+name: PR Check
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  pr-check:
+    name: Smoke Tests & Code Quality
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Setup Playwright Project
+        uses: ./.github/workflows/setup-project
+        with:
+          use_browserstack: "false"
+
+      - name: Check formatting
+        run: npm run format:check
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Run Smoke Tests
+        uses: ./.github/workflows/run-tests
+        with:
+          npm_script: test:smoke:pr
+
+      - name: Upload test reports
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: pr-check-reports-${{ github.run_id }}
+          path: |
+            reports/
+            allure-results/
+          retention-days: 7
+
+

@@ -1,0 +1,62 @@
+name: "Publish Test Reports"
+description: "Upload HTML report, trace, and Allure report as GitHub artifacts and optionally to S3"
+
+inputs:
+  aws_region:
+    description: "AWS region"
+    required: false
+    default: ""
+  aws_access_key_id:
+    description: "AWS access key ID"
+    required: false
+    default: ""
+  aws_secret_access_key:
+    description: "AWS secret access key"
+    required: false
+    default: ""
+
+runs:
+  using: "composite"
+  steps:
+    - name: Upload HTML report
+      uses: actions/upload-artifact@v6
+      with:
+        name: html-report
+        path: reports/
+      continue-on-error: true
+
+    - name: Upload trace artifacts
+      uses: actions/upload-artifact@v6
+      with:
+        name: trace
+        path: trace/
+      continue-on-error: true
+
+    - name: Generate Allure report
+      shell: bash
+      run: yarn run allure:generate
+      continue-on-error: true
+
+    - name: Zip Allure report
+      shell: bash
+      id: zip_allure_report
+      run: zip -r allure-report.zip allure-report
+      continue-on-error: true
+
+    - name: Upload Allure report as artifact
+      uses: actions/upload-artifact@v6
+      with:
+        name: allure-report
+        path: allure-report.zip
+
+    # - name: Upload to S3
+    #   if: ${{ inputs.aws_access_key_id != '' }}
+    #   shell: bash
+    #   env:
+    #     AWS_ACCESS_KEY_ID: ${{ inputs.aws_access_key_id }}
+    #     AWS_SECRET_ACCESS_KEY: ${{ inputs.aws_secret_access_key }}
+    #     AWS_DEFAULT_REGION: ${{ inputs.aws_region }}
+    #   run: |
+    #     aws s3 sync ./report/ s3://tm-github-actions/${{ github.event.repository.name }}/${{ github.run_number }}/html-report/
+    #     aws s3 sync ./trace/ s3://tm-github-actions/${{ github.event.repository.name }}/${{ github.run_number }}/trace/
+    #     aws s3 sync ./allure-report/ s3://tm-github-actions/${{ github.event.repository.name }}/${{ github.run_number }}/allure-report/

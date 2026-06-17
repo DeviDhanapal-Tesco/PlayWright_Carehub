@@ -1,0 +1,50 @@
+name: Run-Test-By-Tag
+
+on:
+  workflow_dispatch:
+    inputs:
+      test_tag:
+        description: "Test tag to run (e.g. smoke, MAG-1234)"
+        required: true
+        type: string
+        default: "wip"
+      bs_profile:
+        description: "BrowserStack browser/OS profile"
+        required: false
+        type: choice
+        default: "Chrome"
+        options:
+          - Chrome
+          - Firefox
+
+jobs:
+  run-job:
+    name: Run Tests by Tag on BrowserStack
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Setup Playwright Project
+        uses: ./.github/workflows/setup-project
+
+      - name: Set build timestamp
+        id: timestamp
+        run: echo "value=$(date +'%Y-%m-%d %H:%M:%S')" >> "$GITHUB_OUTPUT"
+
+      - name: Run Tests
+        uses: ./.github/workflows/run-tests
+        with:
+          browserstack_username: ${{ secrets.BROWSERSTACK_USERNAME }}
+          browserstack_access_key: ${{ secrets.BROWSERSTACK_ACCESS_KEY }}
+          browserstack_build: "Running scenario tagged '${{ github.event.inputs.test_tag }}' on ${{ steps.timestamp.outputs.value }}"
+          project: ${{ github.event.inputs.bs_profile }}
+          test_tag: ${{ github.event.inputs.test_tag }}
+
+      - name: Publish Reports
+        uses: ./.github/workflows/upload-report
+        with:
+          aws_region: eu-west-1
+          aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}

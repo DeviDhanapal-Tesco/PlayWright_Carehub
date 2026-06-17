@@ -1,0 +1,40 @@
+{
+  "name": "playwright-spec",
+  "version": "1.0.0",
+  "description": "Playwright-based BDD test automation framework",
+  "scripts": {
+    "test:wip": "KEEP_BROWSER_OPEN=true playwright test --grep @wip --project=local-chromium --headed --debug --ui",
+    "allure:clean": "rm -rf allure-results allure-report",
+    "allure:generate": "allure generate allure-results --clean -o allure-report",
+    "allure:open": "allure open allure-report",
+    "allure:serve": "allure serve allure-results",
+    "html:report": "open reports/index.html",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@playwright/test": "1.59.1",
+    "@types/node": "^25.9.2",
+    "@typescript-eslint/eslint-plugin": "^8.60.0",
+    "@typescript-eslint/parser": "^8.60.0",
+    "allure-commandline": "^2.13.8",
+    "allure-js-commons": "^3.10.0",
+    "allure-playwright": "^3.10.0",
+    "dotenv": "^17.4.2",
+    "eslint": "^10.4.0",
+    "eslint-config-prettier": "^10.1.5",
+    "moment": "^2.30.1",
+    "prettier": "^3.5.3",
+    "ts-node": "^10.9.2",
+    "typescript": "^6.0.3"
+  },
+  "dependencies": {
+    "axios": "^1.17.0"
+  }
+}

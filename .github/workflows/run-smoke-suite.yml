@@ -1,0 +1,42 @@
+name: Smoke-Suite
+
+on:
+  workflow_dispatch:
+    inputs:
+      project:
+        description: "Playwright browser project"
+        required: false
+        type: choice
+        default: "chromium"
+        options:
+          - chromium
+          - firefox
+          - webkit
+  schedule:
+    - cron: "00 10 * * 1-5"
+
+jobs:
+  run-job:
+    name: Smoke Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Setup Playwright Project
+        uses: ./.github/workflows/setup-project
+
+      - name: Run Smoke Tests
+        uses: ./.github/workflows/run-tests
+        with:
+          test_tag: "@smoke"
+          project: ${{ github.event.inputs.project || 'chromium' }}
+          base_url: ${{ secrets.BASE_URL }}
+
+      - name: Publish Reports
+        uses: ./.github/workflows/upload-report
+        with:
+          aws_region: eu-west-1
+          aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}

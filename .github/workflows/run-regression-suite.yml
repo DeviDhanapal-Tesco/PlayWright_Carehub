@@ -1,0 +1,49 @@
+name: Regression-Suite
+
+on:
+  workflow_dispatch:
+    inputs:
+      bs_profile:
+        description: "BrowserStack browser/OS profile"
+        required: false
+        type: choice
+        default: "chrome-mac"
+        options:
+          - chrome-mac
+          - chrome-win11
+          - firefox-win11
+          - safari-mac
+          - edge-win11
+
+jobs:
+  run-job:
+    name: Regression Tests on BrowserStack
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Construct Build Name
+        id: build-name
+        run: echo "value=Regression Tests - $(date +'%Y-%m-%d_%H-%M-%S')" >> $GITHUB_OUTPUT
+
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Setup Playwright Project
+        uses: ./.github/workflows/setup-project
+
+      - name: Run Regression Tests on BrowserStack
+        uses: ./.github/workflows/run-tests
+        with:
+          browserStack_userName: ${{ secrets.BROWSERSTACK_USERNAME }}
+          browserStack_accessKey: ${{ secrets.BROWSERSTACK_ACCESS_KEY }}
+          base_url: ${{ secrets.BASE_URL }}
+          build_name: "Running Regression Suite on ${{ steps.build-name.outputs.value }}"
+          bs_profile: ${{ github.event.inputs.bs_profile || 'chrome-mac' }}
+          npm_script: test:regression:bs
+
+      - name: Publish Reports
+        uses: ./.github/workflows/upload-report
+        with:
+          aws_region: eu-west-1
+          aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}

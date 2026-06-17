@@ -1,0 +1,24 @@
+# Dependencies
+node_modules/
+
+# Test artifacts & reports
+reports/
+test-results/
+playwright-report/
+
+# Screenshots & videos generated during tests
+trace/
+allure-report/
+allure-results/
+
+# TypeScript build output
+dist/
+
+# Environment variables (contains secrets)
+.env
+.env.local
+.env.*.local
+
+# OS files
+.DS_Store
+Thumbs.db

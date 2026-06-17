@@ -1,0 +1,51 @@
+name: "Run Playwright Tests"
+description: "Run Playwright tests with optional tag filter and browser project"
+
+inputs:
+  test_tag:
+    description: "Playwright grep expression to filter tests (e.g. @smoke, @MAG-1234)"
+    required: false
+    default: ""
+  project:
+    description: "Playwright browser project (local-chromium, local-firefox, local-webkit, Chrome)"
+    required: false
+    default: "Chrome"
+  browserstack_username:
+    description: "BrowserStack username (required when project is Chrome)"
+    required: false
+    default: ""
+  browserstack_access_key:
+    description: "BrowserStack access key (required when project is Chrome)"
+    required: false
+    default: ""
+  browserstack_build:
+    description: "Build name shown in the BrowserStack Automate dashboard"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Print Test Configuration
+      shell: bash
+      run: |
+        echo "===== Test Configuration ====="
+        echo "Project    : ${{ inputs.project }}"
+        echo "Test Tag   : ${{ inputs.test_tag }}"
+        echo "Base URL   : ${{ inputs.base_url }}"
+        echo "BS Build   : ${{ inputs.browserstack_build }}"
+        echo "=============================="
+
+    - name: Run Playwright Tests
+      shell: bash
+      run: |
+        ARGS="--project=${{ inputs.project }}"
+        if [ -n "${{ inputs.test_tag }}" ]; then
+          ARGS="$ARGS --grep @${{ inputs.test_tag }}"
+        fi
+        npx playwright test $ARGS
+      env:
+        BROWSERSTACK_USERNAME: ${{ inputs.browserstack_username }}
+        BROWSERSTACK_ACCESS_KEY: ${{ inputs.browserstack_access_key }}
+        BROWSERSTACK_BUILD: ${{ inputs.browserstack_build }}
+        CI: true
+      continue-on-error: true
