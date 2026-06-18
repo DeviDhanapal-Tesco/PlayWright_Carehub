@@ -5,8 +5,10 @@ export type UIFixture = {
 };
 
 export const test = base.extend<UIFixture>({
-  uiTest: async ({ page }, use) => {
-    await use(new UITest(page));
-  },
+  uiTest: [async ({ page }, use) => {
+    const uiTest = new UITest(page);
+    await use(uiTest);
+    await uiTest.afterTest();
+  }, { auto: true }],
 });
 export { expect } from '@playwright/test';

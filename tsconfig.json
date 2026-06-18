@@ -21,6 +21,6 @@
     },
     "types": ["node"]
   },
-  "include": ["src/**/*.ts", "tests/**/*.ts", "shared/**/*.ts"],
+  "include": ["*.config.ts", "src/**/*.ts", "tests/**/*.ts", "shared/**/*.ts"],
   "exclude": ["node_modules", "dist", "reports", "allure-results", "allure-report"]
 }

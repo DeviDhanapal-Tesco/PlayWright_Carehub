@@ -1,20 +1,21 @@
 import { step } from 'allure-js-commons';
 
-export const logError = (log: string, error?: Error): void => {
+export const logError = async (log: string, error?: Error): Promise<void> => {
   const errorMessage = error ? `${log} - Error: ${error.message}` : log;
-  step(`ERROR || ${errorMessage}`, async () => {});
-  console.error(`ERROR || ${errorMessage}`);
+  await step(`ERROR || ${errorMessage}`, () => {
+    console.error(`ERROR || ${errorMessage}`);
+  });
 };
 
-export const logStep = async (message: string): Promise<void> => {
-  await step(`STEP || ${message}`, async () => {
+export const logStep = async (message: string) => {
+  await step(`STEP || ${message}`, () => {
     console.log(`STEP || ${message}`);
   });
 };
 
-export const reportApiError = (error: unknown, operation: string): never => {
+export const reportApiError = async (error: unknown, operation: string): Promise<never> => {
   const err = error instanceof Error ? error : new Error(String(error));
-  logError(`${operation} Error:`, err);
+  await logError(`${operation} Error:`, err);
   throw error;
 };
 

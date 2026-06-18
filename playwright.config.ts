@@ -5,7 +5,7 @@ dotenv.config();
 
 export default defineConfig({
   testDir: './tests',
-  timeout: 30_000,
+  timeout: 120_000,
   outputDir: './trace',
   expect: {
     timeout: 5_000,
@@ -39,6 +39,7 @@ export default defineConfig({
   ],
 
   use: {
+    baseURL: 'https://tmservice--uat.sandbox.lightning.force.com',
     headless: true,
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',

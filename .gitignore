@@ -19,6 +19,9 @@ dist/
 .env.local
 .env.*.local
 
+# Auth session files (contain live tokens — never commit)
+data/auth/
+
 # OS files
 .DS_Store
 Thumbs.db
